@@ -1,11 +1,29 @@
 {
   "name": "server-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
   },
   "author": "TTToan",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ToanCris102/api-air.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ToanCris102/api-air/issues"
+  },
+  "homepage": "https://github.com/ToanCris102/api-air#readme",
+  "description": "",
+  "dependencies": {
+    "argon2": "^0.28.4",
+    "body-parser": "^1.19.1",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.2.1",
+    "nodemon": "^2.0.15"
+  }
 }
