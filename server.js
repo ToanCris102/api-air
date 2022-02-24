@@ -2,8 +2,9 @@ const { config } = require('dotenv')
 const express = require('express')
 const mongoose = require('mongoose')
 require('dotenv')/config()
-const userRoutes = require('./api/routes/users')
 const bodyParser = require('body-parser')
+const userRoutes = require('./api/routes/users')
+const flightRoutes = require('./api/routes/flights')
 
 const app = express()
 
@@ -33,6 +34,7 @@ app.use(express.json())
 
 // handle request 
 app.use('/api/users', userRoutes)     
+app.use('/api/flights', flightRoutes)
 
 
 

@@ -30,7 +30,7 @@ router.post('/signup', async (req, res) => {
     try {
         // Check for existing
         const user = User.findOne({ userPhoneNumber })
-        if(user.length >= 1) {
+        if(user) {
             return res
                     .status(400)
                     .json({ 
@@ -80,12 +80,12 @@ router.post('/login', async(req, res) => {
                 .status(400)
                 .json({
                     success: false,
-                    message: 'Missing Phone Number or/and Password'
+                    message: 'Missing Phone Number or/and Password 1'
                 })
     try {
         //Check for existing user
         const user = await User.findOne({ userPhoneNumber })
-        if(user.length < 1)
+        if(!user)
             return res
                     .status(401)
                     .json({
