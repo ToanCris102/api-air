@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 
+
+
 const flightSchema = new mongoose.Schema({
     airCode: {
         type: String,
@@ -23,8 +25,14 @@ const flightSchema = new mongoose.Schema({
         required: true
     },
     seatting: {
-        type: Array
+        type: Array,
+        required: true,
+    },
+    percentage: {
+        type: Number,
+        default: 3000
     }
+
 })
 
 module.exports = mongoose.model('Flight', flightSchema)

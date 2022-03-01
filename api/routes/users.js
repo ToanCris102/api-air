@@ -4,12 +4,13 @@ const jwt = require('jsonwebtoken')
 const argon2 = require('argon2')
 const User = require('../models/User')
 
-
+// router temp
 router.get('/', (req, res) => {
-    res
-        .status(200)
-        .json({
-            message: "users get api"
+    User.find({})
+        .then(result => {
+            res
+            .status(200)
+            .send(result)
         })
 })
 
@@ -17,19 +18,19 @@ router.get('/', (req, res) => {
 // @desc Signup User
 // @access Public
 router.post('/signup', async (req, res) => {
-    const {userName, userPassword, userEmail, userPhoneNumber} = req.body
+    const {userName, userPassword, userEmail, userPhoneNumber, identificationCard} = req.body
     //Vadilation
-    if(!userName || !userPassword || !userEmail || !userPhoneNumber){
+    if(!userName || !userPassword || !userEmail || !userPhoneNumber || !identificationCard){
         return res
                 .status(400)
                 .json({ 
                     success: false,
-                    message: 'Missing UserName and/or UserPassword, Email!!!'
+                    message: 'Missing UserName and/or UserPassword, Email, IdentificationCard!!!'
                 })
     }
     try {
         // Check for existing
-        const user = User.findOne({ userPhoneNumber })
+        const user = User.findOne({ identificationCard })
         if(user) {
             return res
                     .status(400)
@@ -41,6 +42,7 @@ router.post('/signup', async (req, res) => {
         // After check
         const hashedPassword = await argon2.hash(userPassword)
         const newUser = new User({
+            identificationCard,
             userName: userName,
             userPhoneNumber: userPhoneNumber,
             userPassword: hashedPassword,
@@ -73,24 +75,24 @@ router.post('/signup', async (req, res) => {
 // @desc Login User
 // @access Public
 router.post('/login', async(req, res) => {
-    const { userPhoneNumber, userPassword} = req.body
+    const { identificationCard, userPassword} = req.body
     //Vadilation
-    if(!userPhoneNumber || !userPassword)
+    if(!userPhoneNumber || !identificationCard)
         return res
                 .status(400)
                 .json({
                     success: false,
-                    message: 'Missing Phone Number or/and Password 1'
+                    message: 'Missing Identification Card or/and Password 1'
                 })
     try {
         //Check for existing user
-        const user = await User.findOne({ userPhoneNumber })
+        const user = await User.findOne({ identificationCard })
         if(!user)
             return res
                     .status(401)
                     .json({
                         success: false,
-                        message: "Incorrect Phone Number and/or Password"
+                        message: "Incorrect Identification Card and/or Password"
                     })
         // after check 
         const passwordValid = await argon2.verify(user.userPassword, userPassword)
@@ -99,7 +101,7 @@ router.post('/login', async(req, res) => {
                     .status(400)
                     .json({
                         success: false,
-                        message: 'Incorrect Phone Number or/and Password'
+                        message: 'Incorrect Identification Card or/and Password'
                     })
         // All good, Return token by use jsonwebtoken
         const accessToken = jwt.sign(

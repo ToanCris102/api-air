@@ -5,10 +5,14 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    identificationCard: {
+        type: String,
+        required: true,
+        unique: true
+    },
     userPhoneNumber: {
         type: String,
         required: true,
-        unique: true,
         match: /(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/
     },
     userPassword: {
