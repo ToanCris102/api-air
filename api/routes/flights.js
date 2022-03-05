@@ -22,9 +22,11 @@ router.get('/', (req, res) => {
 // @Desc Insert data for Flight 
 // @Access private
 router.post('/add', async(req, res) => {
-    const {airCode, airline, departure, destination, departureTime} = req.body
+    const { airCode, airName, departure, destination, departureTime, timeTemp, price} = req.body
+    // airCode mã chuyến bay, airName: tên chuyến bay, departure: điểm đi, destination: điểm đến,
+    // departureTime: giờ khởi hành, timeTemp: giờ dự kiến, price: giá chuyến bay 
     // Check input
-    if(!airCode || !airline || !departure || !destination || !departureTime)
+    if(!airCode || !airName || !departure || !destination || !departureTime || !timeTemp || !price)
         return res
                 .status(400)
                 .json({
@@ -42,17 +44,23 @@ router.post('/add', async(req, res) => {
                         message: 'Flight already exists'
                     })
         // All fine
-        const seatting = new Array(100)
-        for(let n=0; n < 100; n++){
-            seatting[n] = 0
+        const seatting = new Array(2)
+        for(let n=0; n < 2; n++){
+            seatting[n] = 50
         }
+        const newTime = new Date()
+        //newTime.toLocaleDateString date not time
+        //newTime.toLocaleTimeString time not date
+        // newTime.toString() convert a date object to a string
         const newFlight = new Flight({
             airCode,
-            airline,
+            airName,
             departure,
             destination,
             departureTime,
-            seatting
+            timeTemp,
+            seatting,
+            price
         })
         await newFlight.save()
 
@@ -77,19 +85,15 @@ router.post('/add', async(req, res) => {
 // @Desc Update data for Flight 
 // @Access private
 router.put('/update/:id', async(req, res) => {
-    const {airCode, airline, departure, destination, departureTime, seatting} = req.body
+    const { airCode, airName, departure, destination, departureTime, timeTemp, price} = req.body
     const id = req.params.id
-    if(!airCode || !airline || !departure || !destination || !departureTime || !seatting || !id)
+    if(!airCode || !airName || !departure || !destination || !departureTime || !timeTemp || !price)
         return res
                 .status(400)
                 .json({
                     success: false,
-                    message: "Missing necessary information",
-                    request: {
-                        type: 'GET',
-                        url: 'http://localhost:3000/api/flights'
-                    }
-                })
+                    message: "Missing necessary information"
+                })    
     try {
         // Check for existing
         const flight = Flight.findOne({ airCode })
@@ -102,12 +106,14 @@ router.put('/update/:id', async(req, res) => {
                     })
         // All fine
         const newFlight = {
-            airCode: airCode,
-            airline: airline,
-            departure: departure,
-            destination: destination,
-            departureTime: departureTime,
-            seatting: seatting
+            airCode,
+            airName,
+            departure,
+            destination,
+            departureTime,
+            timeTemp,
+            price,
+            seatting
         }
         await Flight.findByIdAndUpdate({_id: id}, newFlight, {new: true})
                     .then(result => {

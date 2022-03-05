@@ -1,18 +1,18 @@
 const mongoose = require('mongoose')
 
 const UserFlightInfoSchema = new mongoose.Schema({
-    airCode: {
-        type: mongoose.Schema.airCode,
+    idFlight: {
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Flight',
         required: true
     },
     identificationCard: {
-        type: mongoose.Schema.identificationCard,
+        type: [mongoose.Schema.identificationCard],
         ref: 'User',
         required: true
     },
     numberSeatting: {
-        type: Array,
+        type: Number,
         required: true
     },
     cost: {

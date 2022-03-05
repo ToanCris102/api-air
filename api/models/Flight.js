@@ -6,9 +6,9 @@ const flightSchema = new mongoose.Schema({
     airCode: {
         type: String,
         required: true,
-        unique: true        
+        unique: true
     },
-    airline: {
+    airName: {
         type: String,
         required: true
     },
@@ -22,16 +22,44 @@ const flightSchema = new mongoose.Schema({
     },
     departureTime: {
         type: Date,
-        required: true
+        // hour: {
+        //     type: String,
+        //     required: true
+        // },
+        // minute: {
+        //     type: String,
+        //     required: true
+        // }
+    },
+    timeTemp: {
+        hour: {
+            type: Number,
+            required: true
+        },
+        minute: {
+            type: Number,
+            required: true
+        }      
     },
     seatting: {
         type: Array,
-        required: true,
+        default: [50,50]
     },
     percentage: {
+        tax: {
+            type: Number,
+            default: 1
+        },
+        business: {
+            type: Number,
+            default: 1
+        }
+    },
+    price: {
         type: Number,
-        default: 3000
+        required: true    
     }
+
 
 })
 

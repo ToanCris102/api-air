@@ -41,6 +41,7 @@ app.use('/api/flights', flightRoutes)
 // Create server
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
-    console.log(`App listening port as ${PORT}`)
+    let curDate = new Date()
+    console.log(`App listening port as ${PORT} - Time: `+ curDate)
 })
 
