@@ -3,6 +3,7 @@ const router = express.Router()
 const jwt = require('jsonwebtoken')
 const argon2 = require('argon2')
 const User = require('../models/User')
+const userMiddleware = require('../middleware/userMiddleware')
 
 // router temp
 router.get('/', (req, res) => {
@@ -17,29 +18,9 @@ router.get('/', (req, res) => {
 // @route POST /signup
 // @desc Signup User
 // @access Public
-router.post('/signup', async (req, res) => {
+router.post('/signup',[userMiddleware.checkSignUp] , async (req, res) => {
     const {userName, userPassword, userEmail, userPhoneNumber, identificationCard} = req.body
-    //Vadilation
-    if(!userName || !userPassword || !userEmail || !userPhoneNumber || !identificationCard){
-        return res
-                .status(400)
-                .json({ 
-                    success: false,
-                    message: 'Missing UserName and/or UserPassword, Email, IdentificationCard!!!'
-                })
-    }
     try {
-        // Check for existing
-        const user = User.findOne({ identificationCard })
-        if(user) {
-            return res
-                    .status(400)
-                    .json({ 
-                        success: false,
-                        message: 'User email already taken'
-                    })
-        }
-        // After check
         const hashedPassword = await argon2.hash(userPassword)
         const newUser = new User({
             identificationCard,
@@ -74,27 +55,11 @@ router.post('/signup', async (req, res) => {
 // @route /login
 // @desc Login User
 // @access Public
-router.post('/login', async(req, res) => {
+router.post('/login',[userMiddleware.checkLogin] , async(req, res) => {
     const { identificationCard, userPassword} = req.body
-    //Vadilation
-    if(!identificationCard || !identificationCard)
-        return res
-                .status(400)
-                .json({
-                    success: false,
-                    message: 'Missing Identification Card or/and Password 1'
-                })
     try {
         //Check for existing user
         const user = await User.findOne({ identificationCard })
-        if(!user)
-            return res
-                    .status(401)
-                    .json({
-                        success: false,
-                        message: "Incorrect Identification Card and/or Password"
-                    })
-        // after check 
         const passwordValid = await argon2.verify(user.userPassword, userPassword)
         if(!passwordValid)
             return res
@@ -120,6 +85,41 @@ router.post('/login', async(req, res) => {
             success: false,
             message: 'Internal server error'
         })
+    }
+})
+
+// @Path api/users/delete
+// @Desc Delete data for User
+// @Access private
+router.delete('/delete/:id', async(req, res) => {
+    const id = req.params.id
+    if(!id)
+        return res
+                .status(400)
+                .json({
+                    success: false,
+                    message: "Missing necessary information"
+                })
+    try {
+        await User.findByIdAndDelete({_id: id})
+                    .then(result => {
+                        res.json({
+                            success: true,
+                            message: "User delete successfully",
+                            request: {
+                                type: 'POST',
+                                url: 'http://localhost:9000/api/users'
+                            }
+                        })
+                    })        
+    } catch (error) {
+        console.log(error)
+        res
+            .status(500)
+            .json({
+                success: false,
+                message: 'Internal server error!!!'
+            })
     }
 })
 

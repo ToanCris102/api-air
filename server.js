@@ -3,9 +3,9 @@ const express = require('express')
 const mongoose = require('mongoose')
 require('dotenv')/config()
 const bodyParser = require('body-parser')
+const cors = require('cors')
 const userRoutes = require('./api/routes/users')
 const flightRoutes = require('./api/routes/flights')
-
 const app = express()
 
 // Access database
@@ -31,6 +31,7 @@ connectDB()
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(express.json())
+app.use(cors())
 
 // handle request 
 app.use('/api/users', userRoutes)     
