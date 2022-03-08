@@ -77,7 +77,7 @@ router.post('/signup', async (req, res) => {
 router.post('/login', async(req, res) => {
     const { identificationCard, userPassword} = req.body
     //Vadilation
-    if(!userPhoneNumber || !identificationCard)
+    if(!identificationCard || !identificationCard)
         return res
                 .status(400)
                 .json({
