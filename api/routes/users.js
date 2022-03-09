@@ -9,6 +9,32 @@ const userMiddleware = require('../middleware/userMiddleware')
 router.get('/', (req, res) => {
     User.find({})
         .then(result => {
+            const respone = {
+                count: result.length,
+                users: result.map(doc => {
+                    return {
+                        User: doc,
+                        request: {
+                            type: 'GET',
+                            url: "http://localhost:9000/api/user/" + doc._id
+                        }
+                    }
+                })
+            }
+            res
+                .status(200)
+                .json(respone)
+        })
+})
+
+
+// @route GET /id
+// @desc show info person
+// @access Public
+router.get('/:id', (req, res) => {
+    const id = req.params.id
+    User.findById({_id: id})
+        .then(result => {
             res
             .status(200)
             .send(result)
@@ -88,7 +114,7 @@ router.post('/login',[userMiddleware.checkLogin] , async(req, res) => {
     }
 })
 
-// @Path api/users/delete
+// @Path api/users/delete/id
 // @Desc Delete data for User
 // @Access private
 router.delete('/delete/:id', async(req, res) => {
