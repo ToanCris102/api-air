@@ -6,10 +6,13 @@ const UserFlightInfoSchema = new mongoose.Schema({
         ref: 'Flight',
         required: true
     },
-    identificationCard: {
-        type: [mongoose.Schema.identificationCard],
-        ref: 'User',
-        required: true
+    // identificationCard: {
+    //     type: [mongoose.Schema.identificationCard],
+    //     ref: 'User',
+    //     required: true
+    // },
+    userInfo: {
+        
     },
     numberSeatting: {
         type: Number,
@@ -18,5 +21,10 @@ const UserFlightInfoSchema = new mongoose.Schema({
     cost: {
         type: String,
         required: true
+    },
+    purchaser: {
+        type: mongoose.Schema.identificationCard,
+        ref: 'InfoUser'
     }
+
 })
