@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const userSchema = mongoose.Schema({
+const userAccountSchema = mongoose.Schema({
     identificationCard: {
         type: String,
         required: true,
@@ -11,29 +11,16 @@ const userSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    // userName: {
-    //     type: String,
-    //     required: true
-    // },
     userName: {
         type: {
-            suffix: {
-                type: String,
-                required: true
-            },
-            firstName: {
-                type: {
-                    type: String,
-                    required: true
-                }
-            },
-            lastName: {
-                type: {
-                    type: String,
-                    required: true
-                }
-            }
+            suffix: String,
+            firstName: String,
+            lastName: String
         },
+        required: true
+    },
+    dateOfBirth: {
+        type: Date,
         required: true
     },
     userPhoneNumber: {
@@ -46,8 +33,9 @@ const userSchema = mongoose.Schema({
         match: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
     },
     role: {
-        type: String,
-        default: "user" 
+        type: mongoose.Schema.Types.ObjectId,        
+        ref: 'Role',     
+        default: "6227a0855580184876a6b641"
     },
     createAt: {
         type: Date,
@@ -55,4 +43,4 @@ const userSchema = mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('User', userSchema)
+module.exports = mongoose.model('UserAccount', userAccountSchema)

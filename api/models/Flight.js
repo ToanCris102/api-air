@@ -58,9 +58,11 @@ const flightSchema = new mongoose.Schema({
     price: {
         type: Number,
         required: true    
+    },
+    createAt: {
+        type: Date,
+        default: Date.now()
     }
-
-
 })
 
 module.exports = mongoose.model('Flight', flightSchema)

@@ -3,32 +3,18 @@ const mongoose = require('mongoose')
 const infoUserSchema = mongoose.Schema({
     identificationCard: {
         type: String,
-        required: true,
         match: /\d{9}/   
     },
     userName: {
         type: {
-            suffix: {
-                type: String,
-                required: true
-            },
-            firstName: {
-                type: {
-                    type: String,
-                    required: true
-                }
-            },
-            lastName: {
-                type: {
-                    type: String,
-                    required: true
-                }
-            }
+            suffix: String,
+            firstName: String,
+            lastName: String
         },
         required: true
     },
     dateOfBirth: {
-        type: Date(),
+        type: Date,
         required: true
     },
     userPhoneNumber: {

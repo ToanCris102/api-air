@@ -1,5 +1,4 @@
 const express = require('express')
-const { find } = require('../models/User')
 const router = express.Router()
 const UserFlightInfo = require('../models/UserFlightInfo')
 

@@ -2,18 +2,21 @@ const express = require('express')
 const router = express.Router()
 const jwt = require('jsonwebtoken')
 const argon2 = require('argon2')
-const User = require('../models/User')
+const UserAccount = require('../models/UserAccount')
 const userMiddleware = require('../middleware/userMiddleware')
 
-// router temp
+// @route GET /api/user-accounts/id
+// @desc show list info person
+// @access private role admin
 router.get('/', (req, res) => {
-    User.find({})
+    UserAccount.find({})
+        .populate('role')
         .then(result => {
             const respone = {
                 count: result.length,
-                users: result.map(doc => {
+                UserAccounts: result.map(doc => {
                     return {
-                        User: doc,
+                        UserAccount: doc,
                         request: {
                             type: 'GET',
                             url: "http://localhost:9000/api/user/" + doc._id
@@ -28,12 +31,12 @@ router.get('/', (req, res) => {
 })
 
 
-// @route GET /id
+// @route GET /api/user-accounts/id
 // @desc show info person
-// @access Public
+// @access private role admin
 router.get('/:id', (req, res) => {
     const id = req.params.id
-    User.findById({_id: id})
+    UserAccount.findById({_id: id})
         .then(result => {
             res
             .status(200)
@@ -41,20 +44,24 @@ router.get('/:id', (req, res) => {
         })
 })
 
-// @route POST /signup
+// ROLE USER: 6227a0855580184876a6b641
+// ROLE ADMIN: 6227a0855580184876a6b643
+
+// @route POST api/user-accounts/signup
 // @desc Signup User
 // @access Public
 router.post('/signup',[userMiddleware.checkSignUp] , async (req, res) => {
-    const {userName, userPassword, userEmail, userPhoneNumber, identificationCard} = req.body
+    const {userName, userPassword, userEmail, userPhoneNumber, identificationCard, dateOfBirth} = req.body
     try {
-        const hashedPassword = await argon2.hash(userPassword)
-        const newUser = new User({
+        const hashedPassword = await argon2.hash(userPassword)        
+        const newUser = new UserAccount({
             identificationCard,
-            userName: userName,
-            userPhoneNumber: userPhoneNumber,
-            userPassword: hashedPassword,
-            userEmail: userEmail
-        })
+            userPassword,
+            userName,
+            dateOfBirth,
+            userPhoneNumber,            
+            userEmail
+        })    
         await newUser.save()
                     
         // Return token by use jsonwebtoken
@@ -78,14 +85,14 @@ router.post('/signup',[userMiddleware.checkSignUp] , async (req, res) => {
     }
 })
 
-// @route /login
+// @route api/user-accounts/login
 // @desc Login User
 // @access Public
 router.post('/login',[userMiddleware.checkLogin] , async(req, res) => {
     const { identificationCard, userPassword} = req.body
     try {
         //Check for existing user
-        const user = await User.findOne({ identificationCard })
+        const user = await UserAccount.findOne({ identificationCard })
         const passwordValid = await argon2.verify(user.userPassword, userPassword)
         if(!passwordValid)
             return res
@@ -114,9 +121,71 @@ router.post('/login',[userMiddleware.checkLogin] , async(req, res) => {
     }
 })
 
-// @Path api/users/delete/id
+// @Path api/user-accounts/update/id
+// @Desc Update data for User
+// @Access private role admin OR user
+router.put('/update/:id' , async (req, res) => {
+    const {userName, identificationCard, dateOfBirth, userPhoneNumber, userEmail} = req.body
+    const id = req.params.id
+    if(!userName || !identificationCard || !dateOfBirth)
+        return res
+                .status(400)
+                .json({ 
+                    success: false,
+                    message: 'Missing of information !!!'
+                })
+    try {      
+        if(userPhoneNumber && userEmail){
+            const newInfoUser = {
+                identificationCard,
+                userName,
+                dateOfBirth,
+                userPhoneNumber,            
+                userEmail                
+            }
+            InfoUser
+                .findByIdAndUpdate({_id: id}, newInfoUser, {new: true})  
+                .then(result => {
+                    res
+                        .status(200)
+                        .json({
+                            success: "true",
+                            message: "Updated User Information",
+                            InfoUser: result
+                        })
+                })
+        }else {
+             const newInfoUser = {
+                identificationCard,
+                userName,
+                dateOfBirth
+            }
+            InfoUser
+                .findByIdAndUpdate({_id: id}, newInfoUser, {new: true})  
+                .then(result => {
+                    res
+                        .status(200)
+                        .json({
+                            success: "true",
+                            message: "Updated User Information",
+                            InfoUser: result
+                        })
+                })
+        }        
+    } catch (error) {
+        console.log(error)
+        res
+            .status(500)
+            .json({
+                success: false,
+                message: 'Internal server error!!!'
+            })
+    }
+})
+
+// @Path api/user-accounts/delete/id
 // @Desc Delete data for User
-// @Access private
+// @Access private role admin 
 router.delete('/delete/:id', async(req, res) => {
     const id = req.params.id
     if(!id)
@@ -127,7 +196,7 @@ router.delete('/delete/:id', async(req, res) => {
                     message: "Missing necessary information"
                 })
     try {
-        await User.findByIdAndDelete({_id: id})
+        await UserAccount.findByIdAndDelete({_id: id})
                     .then(result => {
                         res.json({
                             success: true,
@@ -148,5 +217,7 @@ router.delete('/delete/:id', async(req, res) => {
             })
     }
 })
+
+
 
 module.exports = router

@@ -1,0 +1,13 @@
+User Signup
+{
+	"userPassword": "123456789",
+	"identificationCard": "012345678",
+	"userName": {
+		"suffix": "Mr",
+		"firstName": "Cao Cong",
+		"lastName": "Danh"
+	},
+	"dateOfBirth": "Thu Mar 10 2022",
+	"userPhoneNumber": "0375155102",
+	"userEmail": "danh@gmail.com"
+}

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const User = require('../models/User')
+const UserAccount = require('../models/UserAccount')
 const Role = require('../models/Role')
 
 const verifyToken = (req, res, next) => {
@@ -31,15 +31,15 @@ const verifyToken = (req, res, next) => {
 
 
 const checkSignUp = async (req, res, next)=> {
-    const {userName, userPassword, userEmail, userPhoneNumber, identificationCard} = req.body
-    if(!userName || !userPassword || !userEmail || !userPhoneNumber || !identificationCard)
+    const {userName, userPassword, userEmail, userPhoneNumber, identificationCard, dateOfBirth } = req.body
+    if(!userName || !userPassword || !userEmail || !userPhoneNumber || !identificationCard || !dateOfBirth)
         return res
                 .status(400)
                 .json({ 
                     success: false,
-                    message: 'Missing UserName and/or UserPassword, Email, IdentificationCard!!!'
+                    message: 'Missing UserName and/or UserPassword, Email, IdentificationCard, !!!'
                 })
-    const user = await User.findOne({ identificationCard })
+    const user = await UserAccount.findOne({ identificationCard })
     if(user)
         return res
                 .status(400)
@@ -61,7 +61,7 @@ const checkLogin = async (req, res, next)=> {
                     message: 'Missing Identification Card or/and Password 1'
                 })
         //Check for existing user
-    const user = await User.findOne({ identificationCard })
+    const user = await UserAccount.findOne({ identificationCard })
     if(!user)
         return res
                 .status(401)
