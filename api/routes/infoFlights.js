@@ -5,8 +5,8 @@ const UserFlightInfo = require('../models/UserFlightInfo')
 // @path /info-flight
 // @desc show all data ve flight and user
 // @accesss Public
-router.get('/', (req, res) => {
-    UserFlightInfo
+router.get('/', async(req, res) => {
+    await UserFlightInfo
         .find({})
         .then(result => {
             res

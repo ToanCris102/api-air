@@ -1,48 +1,19 @@
 const express = require('express')
 const router = express.Router()
-const jwt = require('jsonwebtoken')
-const argon2 = require('argon2')
 const UserAccount = require('../models/UserAccount')
 const userMiddleware = require('../middleware/userMiddleware')
+const userAccountController = require('../controllers/userAccounts')
 
-// @route GET /api/user-accounts/id
+// @route GET /api/user-accounts
 // @desc show list info person
 // @access private role admin
-router.get('/', (req, res) => {
-    UserAccount.find({})
-        .populate('role')
-        .then(result => {
-            const respone = {
-                count: result.length,
-                UserAccounts: result.map(doc => {
-                    return {
-                        UserAccount: doc,
-                        request: {
-                            type: 'GET',
-                            url: "http://localhost:9000/api/user/" + doc._id
-                        }
-                    }
-                })
-            }
-            res
-                .status(200)
-                .json(respone)
-        })
-})
+router.get('/', userAccountController.getListUserAccount)
 
 
 // @route GET /api/user-accounts/id
 // @desc show info person
 // @access private role admin
-router.get('/:id', (req, res) => {
-    const id = req.params.id
-    UserAccount.findById({_id: id})
-        .then(result => {
-            res
-            .status(200)
-            .send(result)
-        })
-})
+router.get('/:id', userAccountController.getUserAccount)
 
 // ROLE USER: 6227a0855580184876a6b641
 // ROLE ADMIN: 6227a0855580184876a6b643
@@ -50,173 +21,22 @@ router.get('/:id', (req, res) => {
 // @route POST api/user-accounts/signup
 // @desc Signup User
 // @access Public
-router.post('/signup',[userMiddleware.checkSignUp] , async (req, res) => {
-    const {userName, userPassword, userEmail, userPhoneNumber, identificationCard, dateOfBirth} = req.body
-    try {
-        const hashedPassword = await argon2.hash(userPassword)        
-        const newUser = new UserAccount({
-            identificationCard,
-            userPassword,
-            userName,
-            dateOfBirth,
-            userPhoneNumber,            
-            userEmail
-        })    
-        await newUser.save()
-                    
-        // Return token by use jsonwebtoken
-        const accessToken = jwt.sign(
-                                { userId: newUser._id }, 
-                                process.env.ACCESS_TOKEN_SECRET
-                            )
-        res.json({
-            success: true,
-            message: 'User created successfully',
-            accessToken
-        })
-    } catch (error) {
-        console.log(error)
-        res
-            .status(500)
-            .json({
-                success: false,
-                message: 'Internal server error!!!'
-            })
-    }
-})
+router.post('/signup',[userMiddleware.checkSignUp] , userAccountController.signUp )
 
 // @route api/user-accounts/login
 // @desc Login User
 // @access Public
-router.post('/login',[userMiddleware.checkLogin] , async(req, res) => {
-    const { identificationCard, userPassword} = req.body
-    try {
-        //Check for existing user
-        const user = await UserAccount.findOne({ identificationCard })
-        const passwordValid = await argon2.verify(user.userPassword, userPassword)
-        if(!passwordValid)
-            return res
-                    .status(400)
-                    .json({
-                        success: false,
-                        message: 'Incorrect Identification Card or/and Password'
-                    })
-        // All good, Return token by use jsonwebtoken
-        const accessToken = jwt.sign(
-                                { userId: user._id },
-                                process.env.ACCESS_TOKEN_SECRET
-                            )
-        res.json({ 
-            success: true, 
-            message: 'User logged in successfully', 
-            accessToken 
-        })
-
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({
-            success: false,
-            message: 'Internal server error'
-        })
-    }
-})
+router.post('/login',[userMiddleware.checkLogin] , userAccountController.logIn)
 
 // @Path api/user-accounts/update/id
 // @Desc Update data for User
 // @Access private role admin OR user
-router.put('/update/:id' , async (req, res) => {
-    const {userName, identificationCard, dateOfBirth, userPhoneNumber, userEmail} = req.body
-    const id = req.params.id
-    if(!userName || !identificationCard || !dateOfBirth)
-        return res
-                .status(400)
-                .json({ 
-                    success: false,
-                    message: 'Missing of information !!!'
-                })
-    try {      
-        if(userPhoneNumber && userEmail){
-            const newInfoUser = {
-                identificationCard,
-                userName,
-                dateOfBirth,
-                userPhoneNumber,            
-                userEmail                
-            }
-            InfoUser
-                .findByIdAndUpdate({_id: id}, newInfoUser, {new: true})  
-                .then(result => {
-                    res
-                        .status(200)
-                        .json({
-                            success: "true",
-                            message: "Updated User Information",
-                            InfoUser: result
-                        })
-                })
-        }else {
-             const newInfoUser = {
-                identificationCard,
-                userName,
-                dateOfBirth
-            }
-            InfoUser
-                .findByIdAndUpdate({_id: id}, newInfoUser, {new: true})  
-                .then(result => {
-                    res
-                        .status(200)
-                        .json({
-                            success: "true",
-                            message: "Updated User Information",
-                            InfoUser: result
-                        })
-                })
-        }        
-    } catch (error) {
-        console.log(error)
-        res
-            .status(500)
-            .json({
-                success: false,
-                message: 'Internal server error!!!'
-            })
-    }
-})
+router.put('/update/:id' , userAccountController.updateUserAccount )
 
 // @Path api/user-accounts/delete/id
 // @Desc Delete data for User
 // @Access private role admin 
-router.delete('/delete/:id', async(req, res) => {
-    const id = req.params.id
-    if(!id)
-        return res
-                .status(400)
-                .json({
-                    success: false,
-                    message: "Missing necessary information"
-                })
-    try {
-        await UserAccount.findByIdAndDelete({_id: id})
-                    .then(result => {
-                        res.json({
-                            success: true,
-                            message: "User delete successfully",
-                            request: {
-                                type: 'POST',
-                                url: 'http://localhost:9000/api/users'
-                            }
-                        })
-                    })        
-    } catch (error) {
-        console.log(error)
-        res
-            .status(500)
-            .json({
-                success: false,
-                message: 'Internal server error!!!'
-            })
-    }
-})
+router.delete('/delete/:id', userAccountController.deleteUserAccount)
 
 
 
