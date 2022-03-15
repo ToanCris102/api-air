@@ -1,4 +1,4 @@
-User Signup
+User Signup demo
 {
 	"userPassword": "123456789",
 	"identificationCard": "012345678",
@@ -11,3 +11,54 @@ User Signup
 	"userPhoneNumber": "0375155102",
 	"userEmail": "danh@gmail.com"
 }
+
+User info demo
+{
+	"identificationCard": "012345678",
+	"userName": {
+		"suffix": "Mr",
+		"firstName": "Cao Cong",
+		"lastName": "Danh"
+	},
+	"dateOfBirth": "Thu Mar 10 2022",
+	"userPhoneNumber": "0375155102",
+	"userEmail": "danh@gmail.com"
+}
+Flights demo 
+{
+	"timeTemp": {
+		"hour": 2,
+		"minute": 15
+	},
+	"percentage": {
+		"tax": 1,
+		"business": 1
+	},
+	"airCode": "DT001",
+	"airName": "DAD",
+	"departure": "SGN",
+	"destination": "HAN",
+	"departureTime": "2022-03-24T14:45:00.000Z",
+	"seatting": [50, 50],
+	"price": 1000000
+}
+
+client ngày đi - ngày đên - khứ hồi - số lượng
+ trả danh sách 
+
+viet api trả về từ data danh sách chuyển bay và 
+
+return về danh sách 2 ngày trước khi bay và 2 ngày sau ngày được chọn
+
+{
+	code bua an,
+	true, 
+	false,	
+}
+
+schemaLuggage {
+	weight,
+	price
+}
+
+type: true 1 chiểu false là khứ hồi

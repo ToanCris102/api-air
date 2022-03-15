@@ -30,5 +30,11 @@ router.put('/update/:id', flightController.updateFlight)
 // @Access private
 router.delete('/delete/:id', flightController.deleteFlight)
 
+// @Path api/flights/findFlight
+// @Desc find flight for 
+// @Access private
+
+router.get('/find/:origin/:destination/:departDate/:quantityPassenger/:type', flightController.findFlights)
+// @demo http://localhost:9000/api/flights/find/SGN/HAN/Sat Mar 05 2022 01:33:41 GMT+0700 (Indochina Time)/3/true
 
 module.exports = router

@@ -1,8 +1,10 @@
 const Flight = require('../models/Flight')
-
+const AirportName = require('../models/AirportName')
+const { json } = require('express/lib/response')
 const getListFlight = async (req, res) => {
     await Flight
             .find({})
+            .populate('departure destination')
             .then(result => {
                 res
                     .status(200)
@@ -38,15 +40,25 @@ const setFlight = async(req, res) => {
                 })
     try {
         // Check for existing
-        const flight = Flight.findOne({ airCode })
-        if(!flight)
+        const flight = await Flight.findOne({ airCode })
+        if(flight)
             return res
                     .status(400)
                     .json({ 
                         success: false,
                         message: 'Flight already exists'
                     })
-        // All fine
+        const airNameDeparture = await AirportName.findOne({id: departure})      
+        const airNameDestination = await AirportName.findOne({id: destination})
+        if(!airName1 && !airName2)
+            return res
+                        .status(400)
+                        .json({ 
+                            success: false,
+                            message: 'Airport Name dont already exists'
+                        })
+        const _idDeparture = (airNameDeparture._id).toString()
+        const _idDestination = (airNameDestination._id).toString()
         const seatting = new Array(2)
         for(let n=0; n < 2; n++){
             seatting[n] = 50
@@ -55,11 +67,12 @@ const setFlight = async(req, res) => {
         //newTime.toLocaleDateString date not time
         //newTime.toLocaleTimeString time not date
         // newTime.toString() convert a date object to a string
+
         const newFlight = new Flight({
             airCode,
             airName,
-            departure,
-            destination,
+            departure: _idDeparture,
+            destination: _idDestination,
             departureTime,
             timeTemp,
             seatting,
@@ -95,7 +108,7 @@ const updateFlight = async(req, res) => {
                 })    
     try {
         // Check for existing
-        const flight = Flight.findOne({ airCode })
+        const flight = await Flight.findOne({ airCode })
         if(!flight)
             return res
                     .status(400)
@@ -103,12 +116,23 @@ const updateFlight = async(req, res) => {
                         success: false,
                         message: 'Flight does not exist'
                     })
+        const airNameDeparture = await AirportName.findOne({id: departure})      
+        const airNameDestination = await AirportName.findOne({id: destination})
+        if(!airName1 && !airName2)
+            return res
+                        .status(400)
+                        .json({ 
+                            success: false,
+                            message: 'Airport Name dont already exists'
+                        })
+        const _idDeparture = (airNameDeparture._id).toString()
+        const _idDestination = (airNameDestination._id).toString()
         // All fine
         const newFlight = {
             airCode,
             airName,
-            departure,
-            destination,
+            departure: _idDeparture,
+            destination: _idDestination,
             departureTime,
             timeTemp,
             price,
@@ -167,10 +191,51 @@ const deleteFlight = async(req, res) => {
 
 }
 
+const findFlights = async(req, res) => {
+    const { origin, destination, type, departDate, quantityPassenger } = req.params
+    var returnDate
+    if(!type){
+        var returnDate = req.body.returnDate
+    }
+    const airNameDeparture = await AirportName.findOne({id: origin})      
+    const airNameDestination = await AirportName.findOne({id: destination})
+    if(!airNameDeparture && !airNameDestination)
+        return res
+                    .status(400)
+                    .json({ 
+                        success: false,
+                        message: 'Airport Name dont already exists'
+                    })
+    const _idDeparture = (airNameDeparture._id).toString()
+    const _idDestination = (airNameDestination._id).toString()
+    const ob = []
+    const flightDeparture = await Flight.find({
+        departure: _idDeparture,
+        destination: _idDestination        
+    })
+    .then(result => {
+        result.map(element => {
+            const date = new Date(departDate)
+            // console.log(date.toLocaleDateString())
+            // console.log(element.departureTime.toLocaleDateString())
+            const dbDate = new Date(element.departureTime.toLocaleDateString())
+            const reqDate = new Date(date.toLocaleDateString())
+            if(element.seatting[0] >= quantityPassenger || element.seatting[1] >= quantityPassenger )
+                if(dbDate.getTime() == reqDate.getTime()){               
+                    ob.push(element)
+                }             
+            
+        })
+        return res.json(ob)
+    })
+
+}
+
 module.exports = { 
     getListFlight,
     getFlight,
     setFlight,
     updateFlight,
-    deleteFlight
+    deleteFlight,
+    findFlights
 }

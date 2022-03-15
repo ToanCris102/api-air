@@ -1,7 +1,5 @@
 const mongoose = require('mongoose')
 
-
-
 const flightSchema = new mongoose.Schema({
     airCode: {
         type: String,
@@ -13,23 +11,17 @@ const flightSchema = new mongoose.Schema({
         required: true
     },
     departure: {
-        type: String,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'AirportName'
     },
     destination: {
-        type: String,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'AirportName'
     },
     departureTime: {
         type: Date,
-        // hour: {
-        //     type: String,
-        //     required: true
-        // },
-        // minute: {
-        //     type: String,
-        //     required: true
-        // }
     },
     timeTemp: {
         hour: {
