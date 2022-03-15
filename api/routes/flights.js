@@ -34,7 +34,7 @@ router.delete('/delete/:id', flightController.deleteFlight)
 // @Desc find flight for 
 // @Access private
 
-router.get('/find/:origin/:destination/:departDate/:quantityPassenger/:type', flightController.findFlights)
-// @demo http://localhost:9000/api/flights/find/SGN/HAN/Sat Mar 05 2022 01:33:41 GMT+0700 (Indochina Time)/3/true
+router.get('/find/:origin/:destination/:departDate/:quantityPassenger', flightController.findFlights)
+// @demo http://localhost:9000/api/flights/find/SGN/HAN/Sat Mar 05 2022 01:33:41 GMT+0700 (Indochina Time)/3
 
 module.exports = router

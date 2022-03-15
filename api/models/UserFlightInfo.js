@@ -2,12 +2,12 @@ const mongoose = require('mongoose')
 
 const UserFlightInfoSchema = new mongoose.Schema({
     idFlight: {
-        type: mongoose.Schema.airCode,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Flight',
         required: true
     },
     userInfo: {
-        type: mongoose.Schema.Types.identificationCard,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'InfoUser',
         required: true
     },
@@ -20,7 +20,7 @@ const UserFlightInfoSchema = new mongoose.Schema({
         required: true
     },
     purchaser: {
-        type: mongoose.Schema.Types.identificationCard,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'InfoUser'
     },
     createAt: {

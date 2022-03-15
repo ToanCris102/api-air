@@ -192,11 +192,7 @@ const deleteFlight = async(req, res) => {
 }
 
 const findFlights = async(req, res) => {
-    const { origin, destination, type, departDate, quantityPassenger } = req.params
-    var returnDate
-    if(!type){
-        var returnDate = req.body.returnDate
-    }
+    const { origin, destination, departDate, quantityPassenger } = req.params
     const airNameDeparture = await AirportName.findOne({id: origin})      
     const airNameDestination = await AirportName.findOne({id: destination})
     if(!airNameDeparture && !airNameDestination)
@@ -213,6 +209,8 @@ const findFlights = async(req, res) => {
         departure: _idDeparture,
         destination: _idDestination        
     })
+    .select('-__v')
+    .populate('departure destination', '-__v')
     .then(result => {
         result.map(element => {
             const date = new Date(departDate)
