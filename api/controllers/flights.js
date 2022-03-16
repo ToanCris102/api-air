@@ -50,7 +50,7 @@ const setFlight = async(req, res) => {
                     })
         const airNameDeparture = await AirportName.findOne({id: departure})      
         const airNameDestination = await AirportName.findOne({id: destination})
-        if(!airName1 && !airName2)
+        if(!airNameDeparture && !airNameDestination)
             return res
                         .status(400)
                         .json({ 
@@ -118,7 +118,6 @@ const updateFlight = async(req, res) => {
                     })
         const airNameDeparture = await AirportName.findOne({id: departure})      
         const airNameDestination = await AirportName.findOne({id: destination})
-        if(!airNameDeparture && !airNameDestination)
             return res
                         .status(400)
                         .json({ 
