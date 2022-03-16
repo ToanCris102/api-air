@@ -40,7 +40,7 @@ const signUp = async (req, res) => {
         const hashedPassword = await argon2.hash(userPassword)        
         const newUser = new UserAccount({
             identificationCard,
-            userPassword,
+            userPassword: hashedPassword,
             userName,
             dateOfBirth,
             userPhoneNumber,            
