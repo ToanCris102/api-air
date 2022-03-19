@@ -3,6 +3,7 @@ const AirportName = require('../models/AirportName')
 const getListAirportName = async (req, res) => {
     await AirportName
         .find({})
+        .select('-__v -_id')
         .then(result => {
             res
                 .status(200)

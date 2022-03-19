@@ -4,7 +4,8 @@ const { json } = require('express/lib/response')
 const getListFlight = async (req, res) => {
     await Flight
             .find({})
-            .populate('departure destination')
+            .select('-__v')
+            .populate('departure destination', '-__v -_id')
             .then(result => {
                 res
                     .status(200)
@@ -18,7 +19,8 @@ const getFlight = async (req, res) => {
     const id = req.params.id
     await Flight
             .find({_id: id})
-            .populate('departure destination')
+            .select('-__v')
+            .populate('departure destination', '-__v _id')
             .then(result => {
                 res
                     .status(200)
@@ -210,7 +212,7 @@ const findFlights = async(req, res) => {
         destination: _idDestination        
     })
     .select('-__v')
-    .populate('departure destination', '-__v')
+    .populate('departure destination', '-__v -_id')
     .then(result => {
         result.map(element => {
             const date = new Date(departDate)
