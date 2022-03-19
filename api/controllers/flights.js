@@ -18,6 +18,7 @@ const getFlight = async (req, res) => {
     const id = req.params.id
     await Flight
             .find({_id: id})
+            .populate('departure destination')
             .then(result => {
                 res
                     .status(200)
