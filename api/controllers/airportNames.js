@@ -13,6 +13,20 @@ const getListAirportName = async (req, res) => {
         })
 }
 
+const getAirportName = async (req, res) => {
+    const id = req.params.id
+    await AirportName
+        .find({id: id})
+        .select('-__v -_id')
+        .then(result => {
+            res
+                .status(200)
+                .json(
+                    result
+                )
+        })
+}
+
 const setAirportName =  async(req, res) => {
     const {id, name} = req.body
     const newAirportName = new AirportName({
@@ -29,5 +43,6 @@ const setAirportName =  async(req, res) => {
 
 module.exports = {
     getListAirportName,
+    getAirportName,
     setAirportName
 }

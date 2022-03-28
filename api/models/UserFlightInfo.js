@@ -11,17 +11,32 @@ const UserFlightInfoSchema = new mongoose.Schema({
         ref: 'InfoUser',
         required: true
     },
-    numberSeatting: {
-        type: Number,
-        required: true
-    },
-    cost: {
-        type: String,
-        required: true
-    },
     purchaser: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'InfoUser'
+    },
+    service: {
+        health: {
+            type: Boolean,
+            default: false
+        },
+        meal: {
+            type: String,
+        },
+        luggage: {
+            LG010: {
+                type: Number,
+                default: 0
+            },
+            LG020: {
+                type: Number,
+                default: 0
+            }
+        }
+    },
+    trader: {
+        type: Boolean,
+        default: false
     },
     createAt: {
         type: Date,
@@ -29,3 +44,5 @@ const UserFlightInfoSchema = new mongoose.Schema({
     }
 
 })
+
+module.exports = mongoose.model('UserFlightInfo', UserFlightInfoSchema)

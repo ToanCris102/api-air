@@ -86,6 +86,7 @@ const checkRolesExisted = async (req, res) => {
             return;
         }
     }
+    next()
 }
 
 

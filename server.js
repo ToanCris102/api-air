@@ -9,6 +9,7 @@ const flightRoutes = require('./api/routes/flights')
 const infoUserRoutes = require('./api/routes/infoUsers')
 const InfoUser = require('./api/models/InfoUser')
 const airportNameRoutes = require('./api/routes/airportNames')
+const infoFlightRoutes = require('./api/routes/infoFlights')
 const app = express()
 
 // Access database
@@ -41,6 +42,7 @@ app.use('/api/user-accounts', userAccountRoutes)
 app.use('/api/flights', flightRoutes)
 app.use('/api/info-users', infoUserRoutes)
 app.use('/api/airportNames', airportNameRoutes)
+app.use('/api/info-flight',infoFlightRoutes)
 
 
 // Create server

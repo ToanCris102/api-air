@@ -7,3 +7,10 @@ const infoFlightController = require('../controllers/infoFlights')
 // @desc show all data ve flight and user
 // @accesss Public
 router.get('/', infoFlightController.getListUserFlightInfo)
+
+// @path /info-flight/add
+// @desc add all data ve flight and user
+// @accesss public
+router.post('/add', infoFlightController.setFlightInfo)
+
+module.exports = router
