@@ -1,6 +1,7 @@
 const UserFlightInfo = require('../models/UserFlightInfo')
 const InfoUser = require('../models/InfoUser')
 const Flight = require('../models/Flight')
+const Utils = require('./utils')
 
 const getListUserFlightInfo = async(req, res) => {
     await UserFlightInfo
@@ -16,15 +17,18 @@ const getListUserFlightInfo = async(req, res) => {
 const setFlightInfo = async(req, res) => {
     const {idFlight, userInfo, purchaser, service} = req.body
     const trader = req.body.trader != null ? req.body.trader : false
+    const _idFlight = await Utils.getObjectId(Flight, "airCode", idFlight)
+    const _userInfo = await Utils.getObjectId(InfoUser, "identificationCard", userInfo)
+    const _purchaser = await Utils.getObjectId(InfoUser, "identificationCard", purchaser)
     const newFlightInfo = new UserFlightInfo({
-        idFlight,
-        userInfo,
-        purchaser,
+        idFlight: _idFlight,
+        userInfo: _userInfo,
+        purchaser: _purchaser,
         service,
         trader
     })
     await newFlightInfo.save()
-    await updateSettingFlight(idFlight, trader)
+    await updateSettingFlight(_idFlight, trader)
     res.json({
         success: true,
         message: "InfoFlight created successfully",
