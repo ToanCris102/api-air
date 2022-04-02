@@ -2,11 +2,28 @@ const UserFlightInfo = require('../models/UserFlightInfo')
 const InfoUser = require('../models/InfoUser')
 const Flight = require('../models/Flight')
 const Utils = require('./utils')
+const AirportName = require('../models/AirportName')
 
 const getListUserFlightInfo = async(req, res) => {
     await UserFlightInfo
         .find({})
-        .populate('idFlight userInfo purchaser')
+        .select('-__V -_id')
+        .populate({
+            path: 'purchaser',
+            select: '-__V'
+        })   
+        .populate({
+            path: 'userInfo',
+            select: '-__V'
+        })  
+        .populate({
+            path: 'idFlight',
+            select: '-__V',
+            populate: {
+                path: 'departure destination',
+                select: 'name id -_id'
+            }
+        })   
         .then(result => {
             res
                 .status(200)
@@ -14,21 +31,27 @@ const getListUserFlightInfo = async(req, res) => {
         })
 }
 
+
+
 const setFlightInfo = async(req, res) => {
     const {idFlight, userInfo, purchaser, service} = req.body
+   
     const trader = req.body.trader != null ? req.body.trader : false
-    const _idFlight = await Utils.getObjectId(Flight, "airCode", idFlight)
-    const _userInfo = await Utils.getObjectId(InfoUser, "identificationCard", userInfo)
-    const _purchaser = await Utils.getObjectId(InfoUser, "identificationCard", purchaser)
+
+    const _idFlight = await Flight.findOne({airCode: idFlight})
+    const _userInfo = await InfoUser.findOne({identificationCard: userInfo})
+    const _purchaser = await InfoUser.findOne({identificationCard: purchaser})
     const newFlightInfo = new UserFlightInfo({
-        idFlight: _idFlight,
-        userInfo: _userInfo,
-        purchaser: _purchaser,
+        idFlight: _idFlight._id,
+        userInfo: _userInfo._id,
+        purchaser: _purchaser._id,
         service,
         trader
     })
     await newFlightInfo.save()
-    await updateSettingFlight(_idFlight, trader)
+    await updateSettingFlight(_idFlight._id, trader)
+    // const mail = 'toanb1805927@studen.ctu.edu.vn'
+    // await Utils.sendMail(mail)
     res.json({
         success: true,
         message: "InfoFlight created successfully",
@@ -49,7 +72,7 @@ const updateSettingFlight = async (id, trader) => {
         {seatting: numb},
         {new: true}    
     ).then(result => {
-        console.log(result)
+        return
     })
 }
 

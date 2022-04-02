@@ -20,6 +20,10 @@ const UserFlightInfoSchema = new mongoose.Schema({
             type: Boolean,
             default: false
         },
+        crip: {
+            type: Boolean,
+            default: false
+        },
         meal: {
             type: String,
         },
@@ -28,7 +32,7 @@ const UserFlightInfoSchema = new mongoose.Schema({
                 type: Number,
                 default: 0
             },
-            LG020: {
+            LG023: {
                 type: Number,
                 default: 0
             }
