@@ -39,12 +39,12 @@ const setFlightInfo = async(req, res) => {
     const trader = req.body.trader != null ? req.body.trader : false
 
     const _idFlight = await Flight.findOne({airCode: idFlight})
-    const _userInfo = await InfoUser.findOne({identificationCard: userInfo})
-    const _purchaser = await InfoUser.findOne({identificationCard: purchaser})
+    const _userInfo = await InfoUser.find({identificationCard: userInfo}).sort({createAt:-1})    
+    const _purchaser = await InfoUser.find({identificationCard: purchaser}).sort({createAt:-1})
     const newFlightInfo = new UserFlightInfo({
         idFlight: _idFlight._id,
-        userInfo: _userInfo._id,
-        purchaser: _purchaser._id,
+        userInfo: _userInfo[0]._id,
+        purchaser: _purchaser[0]._id,
         service,
         trader
     })
@@ -72,7 +72,7 @@ const updateSettingFlight = async (id, trader) => {
         {seatting: numb},
         {new: true}    
     ).then(result => {
-        return
+        console.log(result)
     })
 }
 
