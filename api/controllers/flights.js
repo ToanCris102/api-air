@@ -18,7 +18,7 @@ const getListFlight = async (req, res) => {
 const getFlight = async (req, res) => {
     const id = req.params.id
     await Flight
-            .find({_id: id})
+            .find({airCode: id})
             .select('-__v')
             .populate('departure destination', '-__v _id')
             .then(result => {
