@@ -73,7 +73,7 @@ const logIn = async(req, res) => {
     const { identificationCard, userPassword} = req.body
     try {
         //Check for existing user
-        const user = await UserAccount.findOne({ identificationCard })
+        const user = await UserAccount.findOne({ identificationCard }).populate('role')
         const passwordValid = await argon2.verify(user.userPassword, userPassword)
         if(!passwordValid)
             return res
@@ -84,13 +84,17 @@ const logIn = async(req, res) => {
                     })
         // All good, Return token by use jsonwebtoken
         const accessToken = jwt.sign(
-                                { userId: user._id },
+                                { 
+                                    userId: user._id,
+                                    userRole: user.role.name
+                                },
                                 process.env.ACCESS_TOKEN_SECRET
                             )
         res.json({ 
             success: true, 
             message: 'User logged in successfully', 
-            accessToken 
+            accessToken,
+            role: user.role.name
         })
 
     } catch (error) {
