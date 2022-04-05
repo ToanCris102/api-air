@@ -2,6 +2,7 @@ const UserAccount = require('../models/UserAccount')
 const jwt = require('jsonwebtoken')
 const argon2 = require('argon2')
 
+
 const getListUserAccount = async(req, res) => {
     UserAccount.find({})
         .populate('role')
@@ -24,9 +25,74 @@ const getListUserAccount = async(req, res) => {
         })
 }
 
+// xac thuc 
+const getRoleFromToken = async (req, res) => {
+    const authHeader = req.header('Authorization')
+    const token = authHeader && authHeader.split(' ')[1]
+    
+    if(!token)
+        return res
+                .status(401)
+                .json({
+                    success: false,
+                    messsage: 'Access token not found'
+                })
+    try {
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+        //decoded.role ==="admin"
+        return  res
+                    .status(200)
+                    .json({
+                        success: true,
+                        role: decoded.userRole
+                    })
+    } catch (error) {
+        console.log(error)
+        return res
+                .status(403)
+                .json({
+                    success: false,
+                    message: 'Invalid token',
+                })
+    }
+}
+// get account xac thuc token 
+
+// xac thuc profile
+const getProfileFromToken = async (req, res) => {
+    const authHeader = req.header('Authorization')
+    const token = authHeader && authHeader.split(' ')[1]
+    if(!token)
+        return res
+                .status(401)
+                .json({
+                    success: false,
+                    messsage: 'Access token not found'
+                })
+    try {
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+        //req.userId = decoded.userId   
+        const user = await UserAccount.findById({_id: decoded.userId}).select('-_id -userPassword -role -__v')  
+        return res
+                .status(200)
+                .json({
+                    success: true,
+                    user: user 
+                })
+    } catch (error) {
+        console.log(error)
+        return res
+                .status(403)
+                .json({
+                    success: false,
+                    message: 'Invalid token'
+                })
+    }
+}
+//xac thuc profile
 const getUserAccount = async (req, res) => {
     const id = req.params.id
-    UserAccount.findById({_id: id})
+    await UserAccount.findById({_id: id})
         .then(result => {
             res
             .status(200)
@@ -198,6 +264,8 @@ const deleteUserAccount = async(req, res) => {
 }
 
 module.exports = { 
+    getProfileFromToken,
+    getRoleFromToken,
     getListUserAccount,
     getUserAccount,
     signUp,

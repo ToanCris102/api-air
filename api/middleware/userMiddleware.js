@@ -15,7 +15,7 @@ const verifyToken = (req, res, next) => {
                 })
     try {
         const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
-        req.userId = decoded.userId
+        req.userId = decoded.userId        
         next()
     } catch (error) {
         console.log(error)
@@ -27,6 +27,10 @@ const verifyToken = (req, res, next) => {
                 })
     }
 }
+
+
+
+
 
 
 
@@ -58,7 +62,7 @@ const checkLogin = async (req, res, next)=> {
                 .status(400)
                 .json({
                     success: false,
-                    message: 'Missing Identification Card or/and Password 1'
+                    message: 'Missing Identification Card or/and Password --checkLogin'
                 })
         //Check for existing user
     const user = await UserAccount.findOne({ identificationCard })

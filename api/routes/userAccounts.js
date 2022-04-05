@@ -7,16 +7,27 @@ const userAccountController = require('../controllers/userAccounts')
 // @route GET /api/user-accounts
 // @desc show list info person
 // @access private role admin
-router.get('/', userAccountController.getListUserAccount)
+router.get('/',  userAccountController.getListUserAccount)
 
 
 // @route GET /api/user-accounts/id
 // @desc show info person
 // @access private role admin
-router.get('/:id', userAccountController.getUserAccount)
+router.get('/:id', [userMiddleware.checkLogin], userAccountController.getUserAccount)
 
 // ROLE USER: 6227a0855580184876a6b641
 // ROLE ADMIN: 6227a0855580184876a6b643
+
+// @route GET /api/user-accounts/role
+// @desc get role from token
+// @access private role user and admin
+router.get('/get/role',  userAccountController.getRoleFromToken)
+
+
+// @route GET /api/user-accounts/profile
+// @desc get profile from token
+// @access private role user and admin
+router.get('/get/profile',  userAccountController.getProfileFromToken)
 
 // @route POST api/user-accounts/signup
 // @desc Signup User
