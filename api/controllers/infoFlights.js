@@ -7,7 +7,7 @@ const AirportName = require('../models/AirportName')
 const getListUserFlightInfo = async(req, res) => {
     await UserFlightInfo
         .find({})
-        .select('-__V -_id')
+        .select('-__V')
         .populate({
             path: 'purchaser',
             select: '-__V'
@@ -31,6 +31,33 @@ const getListUserFlightInfo = async(req, res) => {
         })
 }
 
+const getUserFlightInfo = async(req, res) => {
+    const id = req.params.id
+    await UserFlightInfo
+        .findById({_id: id})
+        .select('-__V -_id')
+        .populate({
+            path: 'purchaser',
+            select: '-__V'
+        })   
+        .populate({
+            path: 'userInfo',
+            select: '-__V'
+        })  
+        .populate({
+            path: 'idFlight',
+            select: '-__V',
+            populate: {
+                path: 'departure destination',
+                select: 'name id -_id'
+            }
+        })   
+        .then(result => {
+            res
+                .status(200)
+                .json(result)
+        })
+}
 
 
 const setFlightInfo = async(req, res) => {
@@ -78,5 +105,6 @@ const updateSettingFlight = async (id, trader) => {
 
 module.exports = {
     getListUserFlightInfo,
-    setFlightInfo
+    setFlightInfo,
+    getUserFlightInfo
 }
