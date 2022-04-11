@@ -18,4 +18,20 @@ router.get('/:id', infoFlightController.getUserFlightInfo)
 // @accesss public
 router.post('/add', infoFlightController.setFlightInfo)
 
+// @path /info-flight/status/set
+// @desc set status and send mail for user
+// @accesss private role = admin
+router.post('/status/set', infoFlightController.setStatusFlightAndMail)
+
+
+router.post('/mail', infoFlightController.sendMail)
+
+router.post('/send-code', infoFlightController.sendCodeAndMail)
+
+router.post('/check-code', infoFlightController.checkCode)
+
+router.get('/render-list-user/:airCode', infoFlightController.renderListCustomer)
+
+router.post('/check-password-token', infoFlightController.checkPasswordToSetStatus)
+
 module.exports = router

@@ -51,6 +51,10 @@ const flightSchema = new mongoose.Schema({
         type: Number,
         required: true    
     },
+    status: {
+        type: Boolean,
+        default: true
+    },
     createAt: {
         type: Date,
         default: Date.now()

@@ -57,6 +57,10 @@ const getUserFlightInfo = async(req, res) => {
                 .status(200)
                 .json(result)
         })
+    res.json({
+        success: false,
+        message: "Can't find anything"
+    })
 }
 
 
@@ -76,15 +80,74 @@ const setFlightInfo = async(req, res) => {
         trader
     })
     await newFlightInfo.save()
-    await updateSettingFlight(_idFlight._id, trader)
-    // const mail = 'toanb1805927@studen.ctu.edu.vn'
-    // await Utils.sendMail(mail)
+    await updateSettingFlight(_idFlight._id, trader)    
     res.json({
         success: true,
         message: "InfoFlight created successfully",
         flight: newFlightInfo
     })
    
+}
+
+const sendMail = async (req, res) => {
+    const {purchaser, users, airCode} = req.body
+    const tickets = []
+    const listId = []
+    for (let i in users){
+        await UserFlightInfo        
+            .find({ })
+            .populate({
+                path: 'idFlight',
+                match: {
+                    airCode: airCode
+                }   
+            })
+            .populate({
+                path: 'userInfo',
+                match: {
+                    identificationCard: users[i]
+                }   
+            })
+            .populate({
+                path: 'purchaser',
+                match: {
+                    identificationCard: purchaser
+                }   
+            })
+            .then(result => {
+                const temp = result.filter(element => (element.idFlight!=null && element.userInfo!=null && element.purchaser!=null))
+                if(temp.length > 0){
+                    tickets.push(temp[0])
+                    listId.push(temp[0]._id.toString())
+                }
+                    
+            })    
+        
+    }
+    console.log(listId)
+    console.log(tickets[0].purchaser.userName.suffix + " "+ tickets[0].purchaser.userName.lastName)
+    //res.json(tickets)
+    // users.map( async (user) => {
+    //     await InfoUser
+    //         .find({identificationCard: user})
+    //         .sort({createAt:-1})
+    //         .then(users => {
+    //             const idUser = 
+    //             console.log(users[0]._id)
+    //         })
+    // })
+    
+
+    const content = `
+        <div style="padding: 5px; background-color: #003375">
+            <div style="padding: 10px; background-color: white;">
+                <h5 style="color: #0085ff">Xin Chào ${tickets[0].purchaser.userName.suffix} ${tickets[0].purchaser.userName.lastName} thông tin về số vé của bạn</h5>
+                <p style="color: black">Mã vé: ${listId}</p>
+            </div>
+        </div>
+    `;
+    const mail = 'crisriorock0@gmail.com'
+    return await Utils.sendMail(mail, content)    
 }
 
 const updateSettingFlight = async (id, trader) => {
@@ -103,8 +166,89 @@ const updateSettingFlight = async (id, trader) => {
     })
 }
 
+const checkPasswordToSetStatus = async (req, res) => {
+    const { token, password } = req.body
+    const result = await Utils.checkPasswordWithTokenPassword(password, token)
+    res.json({
+        success: result
+    })
+}
+
+const setStatusFlightAndMail = async (req, res) => {
+    const airCode = req.body.airCode
+    await Flight.findOneAndUpdate(
+        {airCode: airCode},
+        {status: false},
+        {new: true}
+    ).then( result => {
+        const idFlight = result._id
+        UserFlightInfo
+            .find({idFlight: idFlight})
+            .then(result => {
+                result.map(user => {
+                    console.log(user)
+                })
+            })
+    })
+    res.json({
+        message: "update status for Flight and send mail"
+    })
+}
+
+const sendCodeAndMail = async (req, res) => {
+    const {mail} = req.body
+    const code = await Utils.createCodeNumber(mail)
+    res
+        .status(200)
+        .json({
+            code: code
+        })
+}
+
+const checkCode = async (req, res) => {
+    const { code, encode } = req.body
+    const result = await Utils.checkCodeNumber(code, encode)
+    res
+        .status(200)
+        .json({
+            success: result
+        })
+}
+
+const renderListCustomer = async (req, res) => {
+    const airCode = req.params.airCode 
+    const listUser = []
+    await UserFlightInfo        
+        .find({ })
+        .populate({
+            path: 'userInfo'   
+        })
+        .populate({
+            path: 'idFlight',
+            match: {
+                airCode: airCode
+            }   
+        })
+        .then(result => {
+            const temp = result.filter(element => (element.idFlight!=null ))
+            temp.map(element => {
+                listUser.push(element.userInfo)
+            })
+        })    
+    res.json({
+        Quantity: listUser.length,
+        List: listUser
+    })
+}
+
 module.exports = {
     getListUserFlightInfo,
     setFlightInfo,
-    getUserFlightInfo
+    getUserFlightInfo,
+    sendMail,
+    setStatusFlightAndMail,
+    sendCodeAndMail,
+    checkCode,
+    renderListCustomer,
+    checkPasswordToSetStatus
 }
