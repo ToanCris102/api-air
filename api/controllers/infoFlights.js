@@ -136,7 +136,7 @@ const sendMail = async (req, res) => {
     //             console.log(users[0]._id)
     //         })
     // })
-    
+    const title = 'Ticket infomation at ' + Date.now()
 
     const content = `
         <div style="padding: 5px; background-color: #003375">
@@ -146,8 +146,12 @@ const sendMail = async (req, res) => {
             </div>
         </div>
     `;
-    const mail = 'crisriorock0@gmail.com'
-    return await Utils.sendMail(mail, content)    
+    const mail =  tickets[0].purchaser.userEmail//'crisriorock0@gmail.com'
+    await Utils.sendMail(mail, content, title)    
+    res.json({
+        success: true,
+        message: "Send mail after ..."
+    })
 }
 
 const updateSettingFlight = async (id, trader) => {
@@ -184,9 +188,13 @@ const setStatusFlightAndMail = async (req, res) => {
         const idFlight = result._id
         UserFlightInfo
             .find({idFlight: idFlight})
+            .populate('purchaser')
             .then(result => {
-                result.map(user => {
-                    console.log(user)
+                result.map(async user => {
+                    console.log(user.purchaser.userEmail)
+                    const content = 'Chuyến bay của bạn đã bị hủy thông tin chi tiết xin liên hệ 0123456789'
+                    const title = 'Thông báo hủy chuyến bay'
+                    //await Utils.sendMail(user.userEmail, content, title)
                 })
             })
     })

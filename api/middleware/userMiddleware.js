@@ -8,7 +8,7 @@ const verifyToken = (req, res, next) => {
     console.log("Day la token ne: " + token)
     if(!token)
         return res
-                .status(401)
+                //.status(401)
                 .json({
                     success: false,
                     messsage: 'Access token not found'

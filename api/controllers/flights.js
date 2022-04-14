@@ -220,10 +220,12 @@ const findFlights = async(req, res) => {
             // console.log(element.departureTime.toLocaleDateString())
             const dbDate = new Date(element.departureTime.toLocaleDateString())
             const reqDate = new Date(date.toLocaleDateString())
-            if(element.seatting[0] >= quantityPassenger || element.seatting[1] >= quantityPassenger )
-                if(dbDate.getTime() == reqDate.getTime()){               
-                    ob.push(element)
-                }            
+            if(element.status != false){
+                if(element.seatting[0] >= quantityPassenger || element.seatting[1] >= quantityPassenger )
+                    if(dbDate.getTime() == reqDate.getTime()){               
+                        ob.push(element)
+                    }   
+            }         
         })
         return res.json(ob)
     })

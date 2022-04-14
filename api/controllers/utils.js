@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer')
 const argon2 = require('argon2')
 const jwt = require('jsonwebtoken')
 const UserAccount = require('../models/UserAccount')
-const sendMail = async (mail, content) => {
+const sendMail = async (mail, content, title) => {
     //Tiến hành gửi mail, nếu có gì đó bạn có thể xử lý trước khi gửi mail
     var transporter =  nodemailer.createTransport({ // config mail server
         host: 'smtp.gmail.com',
@@ -21,19 +21,20 @@ const sendMail = async (mail, content) => {
     var mainOptions = { // thiết lập đối tượng, nội dung gửi mail
         from: 'NQH-Test nodemailer',
         to: mail,
-        subject: 'Ticket infomation',
+        subject: title,
         text: 'Your text is here',//Thường thi mình không dùng cái này thay vào đó mình sử dụng html để dễ edit hơn
         html: content //Nội dung html mình đã tạo trên kia :))
     }
     transporter.sendMail(mainOptions, function(err, info){
         if (err) {
             console.log(err)
-            req.flash('mess', 'Lỗi gửi mail: '+err)//Gửi thông báo đến người dùng
-            res.redirect('/')
+            //req.flash('mess', 'Lỗi gửi mail: '+err)
+            //Gửi thông báo đến người dùng
+            //res.redirect('/')
         } else {
             console.log('Message sent: ' +  info.response)
-            req.flash('mess', 'Một email đã được gửi đến tài khoản của bạn') //Gửi thông báo đến người dùng
-            res.redirect('/')
+            // req.flash('mess', 'Một email đã được gửi đến tài khoản của bạn') //Gửi thông báo đến người dùng
+            // res.redirect('/')
         }
     })    
     return mainOptions
@@ -42,7 +43,8 @@ const sendMail = async (mail, content) => {
 const createCodeNumber = async (mail) => {
     const code = Math.floor(Math.random() * 800000 + 100000).toString()
     const content = code
-    await sendMail(mail, content)
+    const title = 'Code for ' + Date.now()
+    await sendMail(mail, content, title)
     return await argon2.hash(code) 
 }
 
