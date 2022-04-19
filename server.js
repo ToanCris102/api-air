@@ -10,6 +10,7 @@ const infoUserRoutes = require('./api/routes/infoUsers')
 const InfoUser = require('./api/models/InfoUser')
 const airportNameRoutes = require('./api/routes/airportNames')
 const infoFlightRoutes = require('./api/routes/infoFlights')
+const percentageRoutes = require('./api/routes/percentage')
 const app = express()
 
 // Access database
@@ -43,7 +44,7 @@ app.use('/api/flights', flightRoutes)
 app.use('/api/info-users', infoUserRoutes)
 app.use('/api/airportNames', airportNameRoutes)
 app.use('/api/info-flight',infoFlightRoutes)
-
+app.use('/api/percentage',percentageRoutes)
 
 // Create server
 const PORT = process.env.PORT || 3000

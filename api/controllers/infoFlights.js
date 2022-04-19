@@ -33,34 +33,47 @@ const getListUserFlightInfo = async(req, res) => {
 
 const getUserFlightInfo = async(req, res) => {
     const id = req.params.id
-    await UserFlightInfo
-        .findById({_id: id})
-        .select('-__V -_id')
-        .populate({
-            path: 'purchaser',
-            select: '-__V'
-        })   
-        .populate({
-            path: 'userInfo',
-            select: '-__V'
-        })  
-        .populate({
-            path: 'idFlight',
-            select: '-__V',
-            populate: {
-                path: 'departure destination',
-                select: 'name id -_id'
-            }
-        })   
-        .then(result => {
-            res
-                .status(200)
-                .json(result)
+    try {
+        const infoFlight = await UserFlightInfo
+            .findById({_id: id})
+            .select('-__V -_id')
+            .populate({
+                path: 'purchaser',
+                select: '-__V'
+            })   
+            .populate({
+                path: 'userInfo',
+                select: '-__V'
+            })  
+            .populate({
+                path: 'idFlight',
+                select: '-__V',
+                populate: {
+                    path: 'departure destination',
+                    select: 'name id -_id'
+                }
+            })   
+            .then(result => {
+                if(result != null)
+                    res
+                        .status(200)
+                        .json(result)
+            })
+        //console.log(!infoFlight)
+        if(!infoFlight)
+            return res
+                    .status(401)
+                    .json({
+                        success: false,
+                        message: "Can't find anything"
+                    })
+        
+    } catch (error) {
+        res.json({
+            success: false,
+            message: error.message
         })
-    res.json({
-        success: false,
-        message: "Can't find anything"
-    })
+    }    
 }
 
 
@@ -180,6 +193,7 @@ const checkPasswordToSetStatus = async (req, res) => {
 
 const setStatusFlightAndMail = async (req, res) => {
     const airCode = req.body.airCode
+    const reason = req.body.reason
     await Flight.findOneAndUpdate(
         {airCode: airCode},
         {status: false},
@@ -192,7 +206,7 @@ const setStatusFlightAndMail = async (req, res) => {
             .then(result => {
                 result.map(async user => {
                     console.log(user.purchaser.userEmail)
-                    const content = 'Chuyến bay của bạn đã bị hủy thông tin chi tiết xin liên hệ 0123456789'
+                    const content = `Chuyến bay của bạn đã bị hủy vì lý do: ${reason} <br>Thông tin chi tiết xin liên hệ 0123456789`
                     const title = 'Thông báo hủy chuyến bay'
                     //await Utils.sendMail(user.userEmail, content, title)
                 })
