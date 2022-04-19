@@ -240,6 +240,7 @@ const checkCode = async (req, res) => {
 const renderListCustomer = async (req, res) => {
     const airCode = req.params.airCode 
     const listUser = []
+    const listTemp = []
     await UserFlightInfo        
         .find({ })
         .populate({
@@ -253,8 +254,13 @@ const renderListCustomer = async (req, res) => {
         })
         .then(result => {
             const temp = result.filter(element => (element.idFlight!=null ))
-            temp.map(element => {
-                listUser.push(element.userInfo)
+            temp.map(element => {                
+                if(!listTemp.includes(element.userInfo.identificationCard)){
+                    listTemp.push(element.userInfo.identificationCard)
+                    listUser.push(element.userInfo)
+                }
+                
+                
             })
         })    
     res.json({

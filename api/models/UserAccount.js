@@ -37,6 +37,9 @@ const userAccountSchema = mongoose.Schema({
         ref: 'Role',     
         default: "6227a0855580184876a6b641"
     },
+    image: {
+        type: String,
+    },
     createAt: {
         type: Date,
         default: Date.now()
