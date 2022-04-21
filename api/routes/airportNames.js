@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const AirportName = require('../models/AirportName')
+const userMiddleware = require('../middleware/userMiddleware')
 const airportNameController = require('../controllers/airportNames')
 
 // @Path /api/airportNames

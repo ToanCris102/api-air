@@ -29,7 +29,39 @@ const verifyToken = (req, res, next) => {
 }
 
 
-
+const checkRoleAdmin = async() => {
+    const authHeader = req.header('Authorization')
+    const token = authHeader && authHeader.split(' ')[1]
+    
+    if(!token)
+        return res
+                .status(401)
+                .json({
+                    success: false,
+                    messsage: 'Access token not found'
+                })
+    try {
+        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
+        //decoded.role ==="admin"
+        if(!decoded.role == "admin")
+            return res
+                    .status(401)
+                    .json({
+                        success: false,
+                        messsage: 'Access token not found'
+                    })
+        next()
+        
+    } catch (error) {
+        console.log(error)
+        return res
+                .status(403)
+                .json({
+                    success: false,
+                    message: 'Invalid token',
+                })
+    }
+}
 
 
 
@@ -98,6 +130,7 @@ const checkRolesExisted = async (req, res) => {
 module.exports = {
     checkSignUp,
     checkLogin,
+    checkRoleAdmin,
     checkRolesExisted,
     verifyToken
 }
