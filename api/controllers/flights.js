@@ -223,6 +223,8 @@ const findFlights = async(req, res) => {
             if(element.status != false){
                 if(element.seatting[0] >= quantityPassenger || element.seatting[1] >= quantityPassenger ){
                     const currentDate = new Date()
+                    console.log(currentDate.getHours())
+                    currentDate.setHours(currentDate.getHours() + 6)
                     if(dbDate.getTime() == reqDate.getTime() && dbDate.getTime() > currentDate.getTime()){               
                         ob.push(element)
                     }
@@ -230,7 +232,11 @@ const findFlights = async(req, res) => {
                     
             }         
         })
-        return res.json(ob)
+        res.status(200)
+            .json({
+                success: true,
+                ob
+            })
     })
 
 }
