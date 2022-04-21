@@ -221,10 +221,13 @@ const findFlights = async(req, res) => {
             const dbDate = new Date(element.departureTime.toLocaleDateString())
             const reqDate = new Date(date.toLocaleDateString())
             if(element.status != false){
-                if(element.seatting[0] >= quantityPassenger || element.seatting[1] >= quantityPassenger )
-                    if(dbDate.getTime() == reqDate.getTime()){               
+                if(element.seatting[0] >= quantityPassenger || element.seatting[1] >= quantityPassenger ){
+                    const currentDate = new Date()
+                    if(dbDate.getTime() == reqDate.getTime() && dbDate.getTime() > currentDate.getTime()){               
                         ob.push(element)
-                    }   
+                    }
+                }
+                    
             }         
         })
         return res.json(ob)
