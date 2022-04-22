@@ -240,7 +240,7 @@ const sendMail = async (req, res) => {
         </div>
     `
         const mail =  tickets[0].purchaser.userEmail//'crisriorock0@gmail.com'
-        //await Utils.sendMail(mail, content2, title)    
+        await Utils.sendMail(mail, content2, title)    
         res.json({
             success: true,
             message: "Send mail after ...",
