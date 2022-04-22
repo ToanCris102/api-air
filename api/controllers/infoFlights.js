@@ -57,7 +57,10 @@ const getUserFlightInfo = async(req, res) => {
                 if(result != null)
                     res
                         .status(200)
-                        .json(result)
+                        .json({
+                            success: true,
+                            result: result
+                        })
             })
         //console.log(!infoFlight)
         if(!infoFlight)
