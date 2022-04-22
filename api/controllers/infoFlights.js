@@ -107,6 +107,7 @@ const setFlightInfo = async(req, res) => {
 
 const sendMail = async (req, res) => {
     const {purchaser, users, airCode} = req.body
+    console.log({purchaser, users, airCode})
     try {
         const tickets = []
         const listId = []
@@ -161,18 +162,25 @@ const sendMail = async (req, res) => {
         const day = new Date()
         const title = 'Ticket infomation at ' + day
 
-        const content = `
-            <div style="padding: 5px; background-color: #003375">
-                <div style="padding: 10px; background-color: white;">
-                    <h3 style="color: #0085ff">Xin Chào ${tickets[0].purchaser.userName.suffix} ${tickets[0].purchaser.userName.lastName} thông tin về số vé của bạn</h3>
-                    <p style="color: black">Mã vé: ${listId}</p>
-                </div>
-            </div>
-        `;
+        // const content = `
+        //     <div style="padding: 5px; background-color: #003375">
+        //         <div style="padding: 10px; background-color: white;">
+        //             <h3 style="color: #0085ff">Xin Chào ${tickets[0].purchaser.userName.suffix} ${tickets[0].purchaser.userName.lastName} thông tin về số vé của bạn</h3>
+        //             <p style="color: black">Mã vé: ${listId}</p>
+        //         </div>
+        //     </div>
+        // `;
+        console.log(tickets.length)
+        let idStringCard = ''
+        for(let i = 0; i < tickets.length; i++){
+            idStringCard += `${tickets[i].userInfo.userName.suffix} ${tickets[i].userInfo.userName.lastName}: <span style="font-size: 25px; font-weight: 500;">${listId[i]}</span> <br></br>`
+            //console.log(`${tickets[i].userInfo.userName.suffix} ${tickets[i].userInfo.userName.lastName}: <span style="font-size: 25px; font-weight: 500;">/${listId[i]}/</span> <br></br>`)
+        }
+        
         const trader = tickets[0].trader == false ? 'Business' : 'Economy'
-        console.log(trader)
+        //console.log(trader)
         //console.log(tickets[0].idFlight.departureTime.toTimeString())
-        const content2 = `
+        const content = `
         <div class="mail" style="font-size: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
             <div class="header" style="height: 150px; display: flex; justify-content: center; align-items: center;">
                 <div style="text-align: center;">
@@ -222,8 +230,7 @@ const sendMail = async (req, res) => {
                 <div class="ticket" style="padding-top: 50px; text-align: center; color: #0C172E;">
                     <p style="font-size: 35px; font-weight: 500;">Ticket No</p>
                     <div style="width: 30%; margin: auto; margin-top: 50px; text-align: left; line-height: 35px;">
-                        /Trinh Tan Toan/: <span style="font-size: 25px; font-weight: 500;">/${listId}/</span> <br>
-                        /Cao Cong Danh/:  <span style="font-size: 25px; font-weight: 500;">/6262657244cb22376f525204/</span>
+                        ${idStringCard}
                     </div><br>
                     <p> <b>Notice: </b> For ticket details and ticket printing, please visit the website <span style="font-weight: 500">DaTo Airways</span></p>
                 </div>
@@ -239,12 +246,12 @@ const sendMail = async (req, res) => {
             </div>
         </div>
     `
+    //console.log(content)
         const mail =  tickets[0].purchaser.userEmail//'crisriorock0@gmail.com'
-        await Utils.sendMail(mail, content2, title)    
+        await Utils.sendMail(mail, content, title)    
         res.json({
             success: true,
             message: "Send mail after ...",
-            tickets
         })
     } catch (error) {
         res
@@ -285,19 +292,24 @@ const setStatusFlightAndMail = async (req, res) => {
     const reason = req.body.reason
     await Flight.findOneAndUpdate(
         {airCode: airCode},
-        {status: false},
+        {status: true},
         {new: true}
     ).then( result => {
+        //console.log(result)
         const idFlight = result._id
+        // console.log(idFlight)
         UserFlightInfo
             .find({idFlight: idFlight})
-            .populate('purchaser')
-            .then(result => {
+            .populate({
+                path: 'idFlight purchaser'
+            })
+            .then(result => {           
                 result.map(async user => {
                     console.log(user.purchaser.userEmail)
-                    const content = `Chuyến bay của bạn đã bị hủy vì lý do: ${reason} <br>Thông tin chi tiết xin liên hệ 0123456789`
-                    const title = 'Thông báo hủy chuyến bay'
-                    //await Utils.sendMail(user.userEmail, content, title)
+                    const content = `Chuyến bay số hiệu ${airCode} mã vé ${user._id} của bạn đã bị hủy vì lý do: ${reason} <br>Thông tin chi tiết xin liên hệ 0123456789`
+                    const dayCur = new Date()
+                    const title = 'Thông báo hủy chuyến bay ' + dayCur.toDateString() 
+                    await Utils.sendMail(user.purchaser.userEmail, content, title)
                 })
             })
     })

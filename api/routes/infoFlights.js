@@ -22,8 +22,8 @@ router.post('/add', infoFlightController.setFlightInfo)
 // @path /info-flight/status/set
 // @desc set status and send mail for user
 // @accesss private role = admin
-router.post('/status/set', [userMiddleware.checkRoleAdmin], infoFlightController.setStatusFlightAndMail)
-
+router.post('/status/set',  infoFlightController.setStatusFlightAndMail)
+// [userMiddleware.checkRoleAdmin],
 // @path /info-flight/check-password-token
 // @desc check password
 // @accesss private role = admin
