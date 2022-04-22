@@ -107,68 +107,153 @@ const setFlightInfo = async(req, res) => {
 
 const sendMail = async (req, res) => {
     const {purchaser, users, airCode} = req.body
-    const tickets = []
-    const listId = []
-    for (let i in users){
-        await UserFlightInfo        
-            .find({ })
-            .populate({
-                path: 'idFlight',
-                match: {
-                    airCode: airCode
-                }   
-            })
-            .populate({
-                path: 'userInfo',
-                match: {
-                    identificationCard: users[i]
-                }   
-            })
-            .populate({
-                path: 'purchaser',
-                match: {
-                    identificationCard: purchaser
-                }   
-            })
-            .then(result => {
-                const temp = result.filter(element => (element.idFlight!=null && element.userInfo!=null && element.purchaser!=null))
-                if(temp.length > 0){
-                    tickets.push(temp[0])
-                    listId.push(temp[0]._id.toString())
-                }
-                    
-            })    
-        
-    }
-    console.log(listId)
-    console.log(tickets[0].purchaser.userName.suffix + " "+ tickets[0].purchaser.userName.lastName)
-    //res.json(tickets)
-    // users.map( async (user) => {
-    //     await InfoUser
-    //         .find({identificationCard: user})
-    //         .sort({createAt:-1})
-    //         .then(users => {
-    //             const idUser = 
-    //             console.log(users[0]._id)
-    //         })
-    // })
-    const day = new Date()
-    const title = 'Ticket infomation at ' + day
+    try {
+        const tickets = []
+        const listId = []
+        for (let i in users){
+            await UserFlightInfo        
+                .find({ })
+                .populate({
+                    path: 'idFlight',
+                    match: {
+                        airCode: airCode
+                    },
+                    populate: {
+                        path: 'departure destination',
+                        select: 'name -_id'
+                    }   
+                })
+                .populate({
+                    path: 'userInfo',
+                    match: {
+                        identificationCard: users[i]
+                    }   
+                })
+                .populate({
+                    path: 'purchaser',
+                    match: {
+                        identificationCard: purchaser
+                    }   
+                })
+                .then(result => {
+                    const temp = result.filter(element => (element.idFlight!=null && element.userInfo!=null && element.purchaser!=null))
+                    if(temp.length > 0){
+                        tickets.push(temp[0])
+                        listId.push(temp[0]._id.toString())
+                    }
+                        
+                })    
+            
+        }
+        // console.log(tickets)
+        // console.log(listId)
+        // console.log(tickets[0].purchaser.userName.suffix + " "+ tickets[0].purchaser.userName.lastName)
+        //res.json(tickets)
+        // users.map( async (user) => {
+        //     await InfoUser
+        //         .find({identificationCard: user})
+        //         .sort({createAt:-1})
+        //         .then(users => {
+        //             const idUser = 
+        //             console.log(users[0]._id)
+        //         })
+        // })
+        const day = new Date()
+        const title = 'Ticket infomation at ' + day
 
-    const content = `
-        <div style="padding: 5px; background-color: #003375">
-            <div style="padding: 10px; background-color: white;">
-                <h3 style="color: #0085ff">Xin Chào ${tickets[0].purchaser.userName.suffix} ${tickets[0].purchaser.userName.lastName} thông tin về số vé của bạn</h3>
-                <p style="color: black">Mã vé: ${listId}</p>
+        const content = `
+            <div style="padding: 5px; background-color: #003375">
+                <div style="padding: 10px; background-color: white;">
+                    <h3 style="color: #0085ff">Xin Chào ${tickets[0].purchaser.userName.suffix} ${tickets[0].purchaser.userName.lastName} thông tin về số vé của bạn</h3>
+                    <p style="color: black">Mã vé: ${listId}</p>
+                </div>
+            </div>
+        `;
+        const trader = tickets[0].trader == false ? 'Business' : 'Economy'
+        console.log(trader)
+        //console.log(tickets[0].idFlight.departureTime.toTimeString())
+        const content2 = `
+        <div class="mail" style="font-size: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+            <div class="header" style="height: 150px; display: flex; justify-content: center; align-items: center;">
+                <div style="text-align: center;">
+                    <p style="font-weight: 500; font-size: 25px;">Hi ${tickets[0].purchaser.userName.suffix} ${tickets[0].purchaser.userName.lastName},</p>
+                    <p>Thank you for using DaTo Airways</p>
+                </div>
+            </div>
+            <div class="content" style="color : white;">
+                <div class="yourtrip" style="height: 325px; background-color: #0C172E; border : 2px solid green; text-align: center; padding: 50px 0">
+                    <p style="font-size: 35px; font-weight: 500;">Your trip</p>
+                    <div style="height: 20px;"></div>
+                    <div class="left" style="display: inline-block; width: 25%; height: 100%; text-align: center; padding: 25px;">
+                        <div>
+                            <table style="text-align: left; height: 150px; width: 100%;">
+                                <tr>
+                                    <td>From:</td>
+                                    <td style="font-size: 25px; font-weight: 500; color: #e8a207">${tickets[0].idFlight.departure.name}</td>
+                                </tr>
+                                <tr>
+                                    <td>Depart date:</td>
+                                    <td style="font-size: 25px; font-weight: 500; color: #e8a207">${tickets[0].idFlight.departureTime.toDateString()}<td>
+                                </tr>
+                                <tr>
+                                    <td>Duration:</td>
+                                    <td style="font-size: 25px; font-weight: 500; color: #e8a207">${tickets[0].idFlight.timeTemp.hour} hours ${tickets[0].idFlight.timeTemp.minute} minutes<td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="right" style="display: inline-block; width: 25%; height: 100%; text-align: center; padding: 25px;">
+                        <table style="text-align: left; height: 150px; width: 100%;">
+                            <tr>
+                                <td>To:</td>
+                                <td style="font-size: 25px; font-weight: 500; color: #e8a207">${tickets[0].idFlight.destination.name}</td>
+                            </tr>
+                            <tr>
+                                <td>Depart time:</td>
+                                <td style="font-size: 25px; font-weight: 500; color: #e8a207">${tickets[0].idFlight.departureTime.toTimeString()}<td>
+                            </tr>
+                            <tr>
+                                <td>Class:</td>
+                                <td style="font-size: 25px; font-weight: 500; color: #e8a207">${trader}<td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="ticket" style="padding-top: 50px; text-align: center; color: #0C172E;">
+                    <p style="font-size: 35px; font-weight: 500;">Ticket No</p>
+                    <div style="width: 30%; margin: auto; margin-top: 50px; text-align: left; line-height: 35px;">
+                        /Trinh Tan Toan/: <span style="font-size: 25px; font-weight: 500;">/${listId}/</span> <br>
+                        /Cao Cong Danh/:  <span style="font-size: 25px; font-weight: 500;">/6262657244cb22376f525204/</span>
+                    </div><br>
+                    <p> <b>Notice: </b> For ticket details and ticket printing, please visit the website <span style="font-weight: 500">DaTo Airways</span></p>
+                </div>
+            </div>
+            <div class="footer" style="margin-top: 50px;">
+                <div style="margin: auto; width: 50%; text-align: center;">
+                    <hr><br>
+                    <p>Best regards,</p>
+                    <p>Contact with us if you have any problem</p>
+                    <p style="font-size: 25px; font-weight: 500;">DaTo Airways</p>
+                    <span style="margin-right: 20px;">Hotline: 19008888</span>|<span style="margin-left: 20px;">Email: datoairways@gmail.com</span>
+                </div>
             </div>
         </div>
-    `;
-    const mail =  tickets[0].purchaser.userEmail//'crisriorock0@gmail.com'
-    await Utils.sendMail(mail, content, title)    
-    res.json({
-        success: true,
-        message: "Send mail after ...",
-    })
+    `
+        const mail =  tickets[0].purchaser.userEmail//'crisriorock0@gmail.com'
+        //await Utils.sendMail(mail, content2, title)    
+        res.json({
+            success: true,
+            message: "Send mail after ...",
+            tickets
+        })
+    } catch (error) {
+        res
+            .status(500)
+            .json({
+                success: false,
+                message: error
+            })
+    }
 }
 
 const updateSettingFlight = async (id, trader) => {
