@@ -43,7 +43,8 @@ const sendMail = async (mail, content, title) => {
 const createCodeNumber = async (mail) => {
     const code = Math.floor(Math.random() * 800000 + 100000).toString()
     const content = code
-    const title = 'Code for ' + Date.now()
+    const day = new Date()
+    const title = 'Code for ' + day
     await sendMail(mail, content, title)
     return await argon2.hash(code) 
 }
