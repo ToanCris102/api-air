@@ -70,7 +70,6 @@ const checkSignUp = async (req, res, next)=> {
     const {userName, userPassword, userEmail, userPhoneNumber, identificationCard, dateOfBirth } = req.body
     if(!userName || !userPassword || !userEmail || !userPhoneNumber || !identificationCard || !dateOfBirth)
         return res
-                .status(400)
                 .json({ 
                     success: false,
                     message: 'Missing UserName and/or UserPassword, Email, IdentificationCard, !!!'
@@ -78,7 +77,6 @@ const checkSignUp = async (req, res, next)=> {
     const user = await UserAccount.findOne({ identificationCard })
     if(user)
         return res
-                .status(400)
                 .json({ 
                     success: false,
                     message: 'IdentificationCard already exists'
