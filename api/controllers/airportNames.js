@@ -10,7 +10,7 @@ const getListAirportName = async (req, res) => {
                 .status(200)
                 .json({
                     success: true,
-                    result
+                    result: result
                 })
         })    
     } catch (error) {
@@ -35,7 +35,7 @@ const getAirportName = async (req, res) => {
                 .status(200)
                 .json({
                     success: true,
-                    result
+                    result: result
                 })
         })
     } catch (error) {

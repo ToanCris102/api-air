@@ -44,8 +44,8 @@ router.post('/check-code', infoFlightController.checkCode)
 // @path /info-flight/render-list-user
 // @desc show list users of the flight
 // @accesss private role = admin
-router.get('/render-list-user/:airCode', [userMiddleware.checkRoleAdmin], infoFlightController.renderListCustomer)
-
+router.get('/render-list-user/:airCode',  infoFlightController.renderListCustomer)
+//[userMiddleware.checkRoleAdmin],
 
 
 module.exports = router

@@ -152,12 +152,13 @@ const sendMail = async (req, res) => {
     //             console.log(users[0]._id)
     //         })
     // })
-    const title = 'Ticket infomation at ' + Date.now()
+    const day = new Date()
+    const title = 'Ticket infomation at ' + day
 
     const content = `
         <div style="padding: 5px; background-color: #003375">
             <div style="padding: 10px; background-color: white;">
-                <h5 style="color: #0085ff">Xin Chào ${tickets[0].purchaser.userName.suffix} ${tickets[0].purchaser.userName.lastName} thông tin về số vé của bạn</h5>
+                <h3 style="color: #0085ff">Xin Chào ${tickets[0].purchaser.userName.suffix} ${tickets[0].purchaser.userName.lastName} thông tin về số vé của bạn</h3>
                 <p style="color: black">Mã vé: ${listId}</p>
             </div>
         </div>
@@ -166,7 +167,7 @@ const sendMail = async (req, res) => {
     await Utils.sendMail(mail, content, title)    
     res.json({
         success: true,
-        message: "Send mail after ..."
+        message: "Send mail after ...",
     })
 }
 
