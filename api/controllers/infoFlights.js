@@ -292,7 +292,7 @@ const setStatusFlightAndMail = async (req, res) => {
     const reason = req.body.reason
     await Flight.findOneAndUpdate(
         {airCode: airCode},
-        {status: true},
+        {status: false},
         {new: true}
     ).then( result => {
         //console.log(result)
